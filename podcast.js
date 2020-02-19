@@ -25,13 +25,18 @@ constructor(props){
         pause:false,
         season:'',
         episode:'6',
-        value:0
+        value:0,
+        duration:1,
+        currentTime:1,
+        ratio:1
     }
 }
 
 
-
 componentDidMount(){
+
+
+
 
     song=new Sound(require('./audio.mp3'),Sound.MAIN_BUNDLE,(e)=>{
         if(e){
@@ -50,10 +55,26 @@ this.setState({...this.state,check:true})
     });
            
  
+// setInterval(()=>{
+
+// },0.01)
+
+
+}
+
+
+componentWillUpdate(){
+   if(song!=null){
+    song.getCurrentTime(s=>{
+        this.setState({...this.state,duration:song.getDuration(),currentTime:s,ratio:s/song.getDuration() *100})
+    })
+   } 
 }
 
 
 onPressButtonPlay(){
+    this.setState({...this.state,pause:!this.state.pause})
+
     if(song!=null){
         song.play((success)=>{
             if(!success){
@@ -67,10 +88,15 @@ onPressButtonPlay(){
 onPressButtonPause(){
     if(song!=null){
 
+
         song.pause()
     }
-this.setState({...this.state,pause:!this.state.pause})
-    }
+
+    song.getCurrentTime(s=>{
+        this.setState({...this.state,pause:!this.state.pause,duration:song.getDuration(),currentTime:s,ratio:s/song.getDuration() *100})
+    })
+    
+}
 
 
 
@@ -261,7 +287,7 @@ style={{height:height*0.3,marginTop:40,marginBottom:20,width:width*0.8,borderCol
 
 
 <Slider
-         value={this.state.value}
+         value={this.state.ratio}
          onValueChange={(value)=>this.setState(()=>({value}))}
          step={1}
          minimumValue={0}
@@ -272,47 +298,21 @@ thumbTintColor={'white'}
 />
 
 
-{this.state.pause?
-(
-<TouchableOpacity
-onPress={
-    ()=>{
-        this.onPressButtonPlay.bind(this)
-        this.setState({...this.state,pause:!this.state.pause})
 
-}
-}
->
-<FontAwesomeIcon color={'white'} 
-
-style={{marginTop:10}} icon={faPlay}  size={17}  />
-</TouchableOpacity>
-)
-:
-(
-<TouchableOpacity
-onPress={
-    ()=>{
-        this.onPressButtonPlay.bind(this)
-        this.setState({...this.state,pause:!this.state.pause})
-}
-}
->
-<FontAwesomeIcon color={'white'} style={{marginTop:10}} icon={faPause}  size={17}  />
-</TouchableOpacity>
-)
-}
-
+{this.state.ratio!=1 ?(
+<Text style={{color:'white',fontWeight:'bold',marginTop:-22,marginLeft:width*0.6,fontSize:10}}>
+  {Math.round((this.state.currentTime/60)*100)/100} / {Math.round((this.state.duration/60)*100)/100}  
+        </Text>):(
+            <Text style={{color:'white',fontWeight:'bold',marginTop:-22,marginLeft:width*0.6,fontSize:10}}>
+0.00/0.00
+</Text>
+        )
+        }
 <Text style={{color:'white',fontWeight:'bold',marginTop:30,fontSize:20}}>
 Episode {this.state.episode}
         </Text>
-
-
-
 </View>
 
-    
-    
     )
 
 }
@@ -321,21 +321,32 @@ Episode {this.state.episode}
 
 
 {
-    this.state.episode?(
+    this.state.episode &&!this.state.pause?(
 <TouchableOpacity
-onPress={this.onPressButtonPlay.bind(this)}
+onPress={
+    this.onPressButtonPlay.bind(this)
+    }
 > 
 
- <Text style={{color:'white'}}>
-    Play
-</Text>
+<FontAwesomeIcon color={'white'} 
 
+style={{marginTop:10}} icon={faPause}  size={17}  />
 
 </TouchableOpacity>
     ):(
-        <Text>
+    
+        <TouchableOpacity
+        onPress={
+            this.onPressButtonPause.bind(this)
+            }
+        > 
+        
+        <FontAwesomeIcon color={'white'} 
+        
+        style={{marginTop:10}} icon={faPlay}  size={17}  />
+        
+        </TouchableOpacity>       
 
-        </Text>
     )
 }
 
