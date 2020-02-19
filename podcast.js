@@ -24,7 +24,7 @@ constructor(props){
         check:false,
         pause:false,
         season:'',
-        episode:'6',
+        episode:'',
         value:0,
         duration:1,
         currentTime:1,
@@ -35,10 +35,13 @@ constructor(props){
 
 componentDidMount(){
 
+    const urls=[
+        'http://35.244.1.69/wp-content/uploads/2020/02/EP-1.S2.mp3'
+    ]
 
 
-
-    song=new Sound(require('./audio.mp3'),Sound.MAIN_BUNDLE,(e)=>{
+    // require('./audio.mp3')
+    song=new Sound(urls[0],Sound.MAIN_BUNDLE,(e)=>{
         if(e){
             ToastAndroid.show('Error' ,ToastAndroid.SHORT)
         }
@@ -108,6 +111,9 @@ render(){
 
   const {check}=this.state
 
+
+
+
     return (
         <ScrollView>
 
@@ -159,7 +165,7 @@ render(){
       <View style={{alignItems:'center', marginTop:30,justifyContent:'center'}}>
 
       <TouchableOpacity
-onPress={()=>this.setState({...this.state,season:'',episode:''})}
+onPress={()=>this.setState({...this.state,pause:false,season:'',episode:'',ratio:1,duration:1,currentTime:1})}
 >
 <Text style={{color:'white',marginTop:60,fontSize:20,fontWeight:'bold'}}>
     Podcast's
@@ -333,7 +339,9 @@ onPress={
 style={{marginTop:10}} icon={faPause}  size={17}  />
 
 </TouchableOpacity>
-    ):(
+    ):
+    this.state.season && this.state.episode? 
+    (
     
         <TouchableOpacity
         onPress={
@@ -347,6 +355,10 @@ style={{marginTop:10}} icon={faPause}  size={17}  />
         
         </TouchableOpacity>       
 
+    ):(
+        <Text>
+
+        </Text>
     )
 }
 
